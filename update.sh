@@ -24,7 +24,7 @@ cd "$SCRIPT_DIR"
 
 echo -e "${BLUE}"
 echo "╔══════════════════════════════════════════════════╗"
-echo "║   Simple-Business-Websitebuilder  Updater v0.2  ║"
+echo "║   Simple-Business-Websitebuilder  Updater v0.3  ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo -e "${NC}"
 

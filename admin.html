@@ -18,6 +18,7 @@
   </script>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/news.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body class="admin-page">
@@ -75,6 +76,7 @@
       <a href="#" class="sidebar-link" onclick="switchPage('products')" data-ail-nav="products">📦</a>
       <a href="#" class="sidebar-link" onclick="switchPage('about')" data-ail-nav="about">👥</a>
       <a href="#" class="sidebar-link" onclick="switchPage('contact')" data-ail-nav="contact">✉</a>
+      <a href="#" class="sidebar-link" onclick="switchPage('news')" data-ail-nav="news">📰</a>
       <a href="#" class="sidebar-link" onclick="switchPage('buttons')" data-ail-nav="buttons">🔘</a>
       <div class="sidebar-section-label" style="margin-top:16px" data-ail="secSystem"></div>
       <a href="#" class="sidebar-link" onclick="switchPage('settings')" data-ail-nav="settings">⚙</a>
@@ -85,7 +87,7 @@
 
     <div class="sidebar-footer">
       <button class="btn-logout" id="logoutBtn" onclick="doLogout()" data-ail="logoutBtn"></button>
-      <div class="sidebar-version">v0.2</div>
+      <div class="sidebar-version">v0.3</div>
     </div>
   </aside>
 
@@ -508,7 +510,7 @@
         <h3 id="updateCurrentVerTitle">当前版本 / Current Version</h3>
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
           <div style="background:#f0f2f5;padding:12px 24px;border-radius:8px;font-family:monospace;font-size:1.1rem;font-weight:700;color:#0a1628">
-            v0.2
+            v0.3
           </div>
           <button onclick="checkForUpdates()" id="checkUpdateBtn" class="btn btn-primary">🔍 Check for Updates / 检查更新</button>
         </div>
@@ -552,6 +554,19 @@ docker image prune -f</pre>
         <h3>📋 Changelog / 更新日志</h3>
         <div style="border-left:3px solid #c9a84c;padding-left:16px">
           <div style="margin-bottom:20px">
+            <div style="font-weight:700;color:#0a1628">v0.3 <span style="color:#aaa;font-weight:normal;font-size:.85rem">— News & article pages / 文章页面</span></div>
+            <ul style="color:#666;font-size:.88rem;margin:8px 0 0 0;padding-left:16px;line-height:1.8">
+              <li>Latest News page with article list, pagination, bilingual fallback / 最新动态页面，支持分页与中英双语回退</li>
+              <li>Each article gets its own dedicated URL (/articles/{slug}.html), stored as a physical HTML file / 每篇文章拥有独立 URL（/articles/{slug}.html），存储为实体 HTML 文件</li>
+              <li>Admin article editor: Markdown/HTML, bilingual, cover image, toolbar, image upload / 管理后台文章编辑器：Markdown/HTML、双语、封面图、工具栏、图片上传</li>
+              <li>Uploaded images stored in img/ as a separate Docker volume / 上传图片存储于独立 img/ Docker volume，升级时完整保留</li>
+              <li>Article table buttons (Edit/Draft/Delete) update instantly on UI language switch / 文章列表按钮切换界面语言时立即同步翻译</li>
+              <li>Header nav centered on page; nav font size increased / 导航栏整体居中，字号增大约 2–4px</li>
+              <li>Seed articles pre-loaded on first deploy / 首次部署自动预填3篇示例文章</li>
+              <li>Full bilingual admin UI — zero language mixing / 全面修复管理后台中英文混用问题</li>
+            </ul>
+          </div>
+          <div style="margin-bottom:20px">
             <div style="font-weight:700;color:#0a1628">v0.2 <span style="color:#aaa;font-weight:normal;font-size:.85rem">— Backend rewrite / 后端重构</span></div>
             <ul style="color:#666;font-size:.88rem;margin:8px 0 0 0;padding-left:16px;line-height:1.8">
               <li>Backend migrated from PHP to Node.js + Express / 后端从 PHP 迁移至 Node.js + Express</li>
@@ -582,7 +597,173 @@ docker image prune -f</pre>
       </div>
     </div>
 
+    <!-- ═══ NEWS PAGE ═══ -->
+    <div class="admin-content" id="page-news" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+        <h2 class="admin-page-title" style="margin-bottom:0" data-ail="pageNewsTitle">最新动态管理</h2>
+        <button class="btn btn-primary" onclick="openNewArticle()" data-ail="newArticleBtn">＋ 新建文章</button>
+      </div>
+      <div class="admin-card">
+        <div id="articleListLoading" style="text-align:center;padding:40px;color:#888" data-ail="articlesLoading">加载中...</div>
+        <div id="articleListEmpty" style="display:none;text-align:center;padding:48px;color:#aaa">
+          <div style="font-size:3rem;margin-bottom:14px">📰</div>
+          <p data-ail="noArticles">还没有文章，点击「新建文章」开始创作。</p>
+        </div>
+        <div id="articleListTable" style="display:none">
+          <table class="article-table">
+            <thead>
+              <tr>
+                <th data-ail="articleThTitle">标题</th>
+                <th data-ail="articleThStatus">状态</th>
+                <th data-ail="articleThDate">发布时间</th>
+                <th data-ail="articleThActions">操作</th>
+              </tr>
+            </thead>
+            <tbody id="articleListTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </main>
+</div>
+
+<!-- ═══ ARTICLE EDITOR MODAL ═══ -->
+<div class="admin-modal-overlay" id="articleEditorOverlay" style="display:none">
+  <div class="admin-modal article-editor-modal">
+
+    <!-- Header -->
+    <div class="ae-header">
+      <div>
+        <h3 id="aeModalTitle" data-ail="aeNewTitle">新建文章</h3>
+        <div class="ae-status-row" style="margin-top:8px">
+          <span style="font-size:.82rem;color:#888" data-ail="aeStatusLabel">状态：</span>
+          <button class="ae-status-chip draft" id="aeStatusChip" onclick="toggleAeStatus()" data-ail-draft="aeDraft" data-ail-publish="aePublish">草稿</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary" onclick="closeArticleEditor()" data-ail="aeCancelBtn">取消</button>
+        <button class="btn btn-primary" onclick="saveArticle()" data-ail="aeSaveBtn">保存</button>
+      </div>
+    </div>
+
+    <!-- Cover image -->
+    <div class="admin-field">
+      <label data-ail="aeCoverLabel">封面图片 <span style="color:#aaa;font-weight:400;font-size:.78rem" data-ail="aeCoverHint">（可选，建议 16:9 横图）</span></label>
+      <div class="img-editor">
+        <img class="img-preview" id="aeCoverPreview" src="" style="background:#f0f2f5" onerror="this.style.display='none'">
+        <div class="img-controls">
+          <input type="url" id="aeCoverUrl" data-ail-ph="imgUrl" placeholder="图片URL">
+          <div class="or-divider" data-ail="orDivider">或</div>
+          <label class="btn btn-secondary upload-btn" data-ail="uploadImg">上传图片<input type="file" accept="image/*" onchange="handleArticleCoverUpload(this)"></label>
+          <button class="btn btn-sm" onclick="applyArticleCoverUrl()" data-ail="applyUrl">应用URL</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slug / article URL -->
+    <div class="admin-field">
+      <label data-ail="aeSlugLabel">文章链接</label>
+      <input type="text" id="aeSlug" data-ail-ph="aeSlugPlh" placeholder="my-article" style="font-family:monospace">
+      <div style="font-size:.75rem;color:#aaa;margin-top:5px" data-ail="aeSlugHint">用于文章页面URL：yourdomain.com/articles/{slug}.html</div>
+      <div id="aeSlugPreview" style="font-size:.75rem;color:#c9a84c;margin-top:3px;display:none"></div>
+    </div>
+
+    <!-- Lang tabs -->
+    <div class="ae-lang-tabs">
+      <button class="ae-tab active" id="aeTabZh" onclick="switchArticleTab('zh')">🇨🇳 中文</button>
+      <button class="ae-tab" id="aeTabEn" onclick="switchArticleTab('en')">🇬🇧 English</button>
+      <span class="ae-lang-note" data-ail="aeLangNote">两种语言可分别填写，未填写的语言自动显示另一语言内容</span>
+    </div>
+
+    <!-- ZH content -->
+    <div id="aeContentZh">
+      <div class="admin-field"><label data-ail="aeTitleLabel">标题</label><input type="text" id="aeTitleZh" placeholder="..."></div>
+      <div class="admin-field"><label data-ail="aeSummaryLabel">摘要 <span style="color:#aaa;font-weight:400;font-size:.78rem" data-ail="aeSummaryHint">（文章列表页显示，留空则不显示）</span></label><textarea id="aeSummaryZh" rows="2" placeholder="..."></textarea></div>
+      <div class="admin-field">
+        <div class="ae-format-row">
+          <label data-ail="aeContentLabel">正文</label>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="ae-format-radios">
+              <label><input type="radio" name="aeFormatZh" value="markdown" checked> Markdown</label>
+              <label><input type="radio" name="aeFormatZh" value="html"> HTML</label>
+            </div>
+            <button class="ae-preview-btn" onclick="toggleAePreview('zh')" data-ail="aePreviewBtn">👁 预览</button>
+          </div>
+        </div>
+        <div class="ae-editor-toolbar" id="aeToolbarZh">
+          <button type="button" onclick="aeInsert('zh','bold')" title="Bold"><b>B</b></button>
+          <button type="button" onclick="aeInsert('zh','italic')" title="Italic"><i>I</i></button>
+          <button type="button" onclick="aeInsert('zh','h2')" title="H2">H2</button>
+          <button type="button" onclick="aeInsert('zh','h3')" title="H3">H3</button>
+          <button type="button" onclick="aeInsert('zh','link')" title="Link">🔗</button>
+          <button type="button" onclick="aeInsertImage('zh')" title="Insert Image">🖼</button>
+          <button type="button" onclick="aeInsert('zh','ul')" title="Bullet List">• List</button>
+          <button type="button" onclick="aeInsert('zh','ol')" title="Numbered List">1. List</button>
+          <button type="button" onclick="aeInsert('zh','quote')" title="Blockquote">" Quote</button>
+          <button type="button" onclick="aeInsert('zh','code')" title="Code">&lt;/&gt;</button>
+          <button type="button" onclick="aeInsert('zh','hr')" title="Divider">—</button>
+        </div>
+        <textarea class="ae-content-textarea" id="aeContentZhEditor" placeholder="在此输入文章内容..."></textarea>
+        <div class="ae-preview-area" id="aePreviewZh" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- EN content -->
+    <div id="aeContentEn" style="display:none">
+      <div class="admin-field"><label data-ail="aeTitleLabel">标题</label><input type="text" id="aeTitleEn" placeholder="..."></div>
+      <div class="admin-field"><label data-ail="aeSummaryLabel">摘要 <span style="color:#aaa;font-weight:400;font-size:.78rem" data-ail="aeSummaryHint">（文章列表页显示，留空则不显示）</span></label><textarea id="aeSummaryEn" rows="2" placeholder="..."></textarea></div>
+      <div class="admin-field">
+        <div class="ae-format-row">
+          <label data-ail="aeContentLabel">正文</label>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="ae-format-radios">
+              <label><input type="radio" name="aeFormatEn" value="markdown" checked> Markdown</label>
+              <label><input type="radio" name="aeFormatEn" value="html"> HTML</label>
+            </div>
+            <button class="ae-preview-btn" onclick="toggleAePreview('en')" data-ail="aePreviewBtn">👁 预览</button>
+          </div>
+        </div>
+        <div class="ae-editor-toolbar" id="aeToolbarEn">
+          <button type="button" onclick="aeInsert('en','bold')"><b>B</b></button>
+          <button type="button" onclick="aeInsert('en','italic')"><i>I</i></button>
+          <button type="button" onclick="aeInsert('en','h2')">H2</button>
+          <button type="button" onclick="aeInsert('en','h3')">H3</button>
+          <button type="button" onclick="aeInsert('en','link')">🔗</button>
+          <button type="button" onclick="aeInsertImage('en')">🖼</button>
+          <button type="button" onclick="aeInsert('en','ul')">• List</button>
+          <button type="button" onclick="aeInsert('en','ol')">1. List</button>
+          <button type="button" onclick="aeInsert('en','quote')">" Quote</button>
+          <button type="button" onclick="aeInsert('en','code')">&lt;/&gt;</button>
+          <button type="button" onclick="aeInsert('en','hr')">—</button>
+        </div>
+        <textarea class="ae-content-textarea" id="aeContentEnEditor" placeholder="Enter article content here..."></textarea>
+        <div class="ae-preview-area" id="aePreviewEn" style="display:none"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ IMAGE INSERT DIALOG ═══ -->
+<div class="admin-modal-overlay" id="aeImageDialog" style="display:none">
+  <div class="admin-modal" style="max-width:420px">
+    <h3 data-ail="aeInsertImgTitle">插入图片</h3>
+    <div class="admin-field">
+      <label data-ail="imgUrl">图片URL</label>
+      <input type="url" id="aeImgUrlInput" placeholder="https://...">
+    </div>
+    <div class="or-divider" style="margin:8px 0" data-ail="orDivider">或</div>
+    <div class="admin-field">
+      <label data-ail="uploadImg">上传图片</label>
+      <input type="file" id="aeImgFileInput" accept="image/*" onchange="handleAeImageUpload(this)" style="width:100%;padding:6px 0">
+      <div id="aeImgUploadStatus" style="display:none;margin-top:6px;font-size:.82rem;color:#c9a84c"></div>
+    </div>
+    <div class="admin-modal-actions">
+      <button class="btn-cancel" onclick="closeAeImageDialog()" data-ail="aeCancelBtn">取消</button>
+      <button class="btn-confirm" onclick="insertAeImage()" data-ail="aeInsertImgBtn">插入</button>
+    </div>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -590,6 +771,7 @@ docker image prune -f</pre>
 
 <script src="js/btn-actions.js"></script>
 <script src="js/products-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
 <script src="js/admin.js"></script>
 <script>
 // Sync color pickers with hex inputs on load
@@ -645,7 +827,7 @@ function setThemePreset(primary, accent) {
 }
 
 // ── Update check ─────────────────────────────────────────────────
-const CURRENT_VERSION = 'v0.2';
+const CURRENT_VERSION = 'v0.3';
 const GITHUB_REPO     = 'JayMortal/Simple-Business-Websitebuilder';
 
 function checkForUpdates() {

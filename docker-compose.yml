@@ -4,12 +4,14 @@ services:
     container_name: simple-business-web
     restart: unless-stopped
     ports:
-      - "${PORT:-14514}:14514"
+      - "${PORT:-14515}:14515"
     volumes:
-      # Only the data/ directory is persisted — source code is baked into the image.
-      # This means `docker compose up -d --build` always delivers the latest code,
-      # and data (site content + admin password) is never lost on update.
+      # data/ — JSON config, admin state, articles metadata
       - ./data:/app/data
+      # img/ — uploaded images (user uploads survive container rebuilds)
+      - ./img:/app/img
+      # articles/ — generated article HTML files (rebuilt from template on each server start)
+      - ./articles:/app/articles
     env_file:
       - .env
 
@@ -23,14 +25,14 @@ services:
 #     cp .env.example .env
 #     nano .env          # set ADMIN_PASSWORD and SESSION_SECRET
 #
-#  3. Create the data directory (persisted across updates)
-#     mkdir -p data
+#  3. Create persistent directories
+#     mkdir -p data img articles
 #
 #  4. Build and start
 #     docker compose up -d --build
 #
 #  5. Configure reverse proxy in 1Panel / aaPanel:
-#     Proxy target: http://127.0.0.1:14514
+#     Proxy target: http://127.0.0.1:14515
 #
 # ── Updating to a new version ─────────────────────────────────────
 #
@@ -42,6 +44,6 @@ services:
 #
 # ── Port ──────────────────────────────────────────────────────────
 #
-#  Default host port: 14514
+#  Default host port: 14515
 #  Change in .env: PORT=your_port
 #  Then restart: docker compose up -d

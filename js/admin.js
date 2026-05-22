@@ -52,7 +52,7 @@ const adminI18n = {
     uiLang:'界面语言', editLang:'编辑语言', editLangHint:'右侧编辑的是该语言的前台内容',
     save:'💾 保存更改', preview:'👁 预览',
     home:'首页', products:'产品介绍', about:'关于我们', contact:'联系我们',
-    buttons:'按钮管理', settings:'网站设置', theme:'主题颜色', password:'修改密码',
+    news:'最新动态', buttons:'按钮管理', settings:'网站设置', theme:'主题颜色', password:'修改密码',
     update:'检查更新',
     resetConfirm:'确定重置所有内容为默认值吗？此操作不可撤销！',
     saveOk:'✅ 保存并同步成功！', saveFail:'⚠ 本地已保存，服务器同步失败',
@@ -73,7 +73,7 @@ const adminI18n = {
     uiLang:'UI Language', editLang:'Edit Language', editLangHint:'Right panel edits front-end content in this language',
     save:'💾 Save Changes', preview:'👁 Preview',
     home:'Home', products:'Products', about:'About Us', contact:'Contact',
-    buttons:'Buttons', settings:'Settings', theme:'Theme', password:'Password',
+    news:'News', buttons:'Buttons', settings:'Settings', theme:'Theme', password:'Password',
     update:'Check Updates',
     resetConfirm:'Reset all content to defaults? This cannot be undone!',
     saveOk:'✅ Saved & synced!', saveFail:'⚠ Saved locally. Server sync failed.',
@@ -177,6 +177,18 @@ const adminUIStrings = {
     updateDockerNote: '本项目使用 Docker 容器化部署，更新需要在服务器 SSH 中执行以下命令。网站数据（site-data.json）不会丢失，已通过 Volume 挂载保护。',
     sshCmdLabel: 'SSH 更新命令', cfCacheNote: '登录 Cloudflare → 你的域名 → Caching → Purge Everything 清除 CDN 缓存。建议在 Cache Rules 中将 *.js 和 *.css 设为 Bypass cache，避免下次更新再遇到同样问题。',
     customPathTitle: '💡 如果安装目录不同', customPathDesc: '请将第一行中的路径替换为你的实际安装目录：', applyPathBtn: '应用',
+    // News page
+    pageNewsTitle: '最新动态管理', newArticleBtn: '＋ 新建文章',
+    articlesLoading: '加载中...', noArticles: '还没有文章，点击「新建文章」开始创作。',
+    articleThTitle: '标题', articleThStatus: '状态', articleThDate: '发布时间', articleThActions: '操作',
+    aeNewTitle: '新建文章', aeEditTitle: '编辑文章',
+    aeStatusLabel: '状态：', aeDraft: '草稿', aePublish: '已发布',
+    aeCancelBtn: '取消', aeSaveBtn: '保存',
+    aeCoverLabel: '封面图片', aeCoverHint: '（可选，建议 16:9 横图）',
+    aeSlugLabel: '文章链接（slug）', aeSlugHint: '用于文章页面URL：yourdomain.com/articles/{slug}.html', aeSlugPlh: 'my-article',
+    aeLangNote: '两种语言可分别填写，未填写的语言自动显示另一语言内容',
+    aeTitleLabel: '标题', aeSummaryLabel: '摘要', aeSummaryHint: '（文章列表页显示，留空则不显示）',
+    aeContentLabel: '正文', aePreviewBtn: '👁 预览', aeInsertImgTitle: '插入图片', aeInsertImgBtn: '插入',
     // Shared image controls
     imgUrl: '图片URL', orDivider: '或', uploadImg: '上传图片', applyUrl: '应用URL',
     logoImgUrl: 'Logo图片URL（留空使用文字Logo）', faviconUrl: 'Favicon图片URL',
@@ -260,6 +272,18 @@ const adminUIStrings = {
     viewReleasesLink: 'View full release history on GitHub →',
     copyCmdBtn: '📋 Copy Command',
     cfWarningTitle: '⚠ If page still shows old content after update (Cloudflare users)',
+    // News page
+    pageNewsTitle: 'Latest News', newArticleBtn: '＋ New Article',
+    articlesLoading: 'Loading...', noArticles: 'No articles yet. Click "New Article" to get started.',
+    articleThTitle: 'Title', articleThStatus: 'Status', articleThDate: 'Published', articleThActions: 'Actions',
+    aeNewTitle: 'New Article', aeEditTitle: 'Edit Article',
+    aeStatusLabel: 'Status:', aeDraft: 'Draft', aePublish: 'Published',
+    aeCancelBtn: 'Cancel', aeSaveBtn: 'Save',
+    aeCoverLabel: 'Cover Image', aeCoverHint: '(optional, 16:9 landscape recommended)',
+    aeSlugLabel: 'Article Slug', aeSlugHint: 'Used in the article URL: yourdomain.com/articles/{slug}.html', aeSlugPlh: 'my-article',
+    aeLangNote: 'Fill in either or both. If one language is empty, the other language\'s content is shown instead.',
+    aeTitleLabel: 'Title', aeSummaryLabel: 'Summary', aeSummaryHint: '(shown in article list, optional)',
+    aeContentLabel: 'Content', aePreviewBtn: '👁 Preview', aeInsertImgTitle: 'Insert Image', aeInsertImgBtn: 'Insert',
     imgUrl: 'Image URL', orDivider: 'or', uploadImg: 'Upload Image', applyUrl: 'Apply URL',
     logoImgUrl: 'Logo image URL (leave blank to use text logo)', faviconUrl: 'Favicon image URL',
     customPathPlh: '/opt/1panel/apps/Simple-Business-Websitebuilder',
@@ -375,11 +399,11 @@ function switchAdminLang(lang) {
   // Sidebar nav
   const navMap = {
     home:['首页','Home'], products:['产品介绍','Products'], about:['关于我们','About Us'],
-    contact:['联系我们','Contact'], buttons:['按钮管理','Buttons'],
+    contact:['联系我们','Contact'], news:['最新动态','News'], buttons:['按钮管理','Buttons'],
     settings:['网站设置','Settings'], theme:['主题颜色','Theme'],
     password:['修改密码','Password'], update:['检查更新','Check Updates']
   };
-  const emojiMap = {home:'🏠',products:'📦',about:'👥',contact:'✉',buttons:'🔘',settings:'⚙',theme:'🎨',password:'🔒',update:'🔄'};
+  const emojiMap = {home:'🏠',products:'📦',about:'👥',contact:'✉',news:'📰',buttons:'🔘',settings:'⚙',theme:'🎨',password:'🔒',update:'🔄'};
   document.querySelectorAll('.sidebar-link[onclick]').forEach(a => {
     const m = a.getAttribute('onclick')?.match(/switchPage\('(\w+)'\)/);
     if (!m) return;
@@ -390,8 +414,8 @@ function switchAdminLang(lang) {
   // Breadcrumb
   const bc = document.getElementById('adminBreadcrumb');
   if (bc) {
-    const bcZh = {home:'首页管理',products:'产品管理',about:'关于我们',contact:'联系我们',buttons:'按钮管理',settings:'网站设置',theme:'主题颜色',password:'修改密码',update:'检查更新'};
-    const bcEn = {home:'Home',products:'Products',about:'About Us',contact:'Contact',buttons:'Buttons',settings:'Settings',theme:'Theme',password:'Password',update:'Check Updates'};
+    const bcZh = {home:'首页管理',products:'产品管理',about:'关于我们',contact:'联系我们',news:'最新动态',buttons:'按钮管理',settings:'网站设置',theme:'主题颜色',password:'修改密码',update:'检查更新'};
+    const bcEn = {home:'Home',products:'Products',about:'About Us',contact:'Contact',news:'News',buttons:'Buttons',settings:'Settings',theme:'Theme',password:'Password',update:'Check Updates'};
     const prefix = lang==='en' ? 'Admin / ' : '管理后台 / ';
     // Find current page key from active link
     const active = document.querySelector('.sidebar-link.active[onclick]');
@@ -402,6 +426,8 @@ function switchAdminLang(lang) {
   loadAllFields();
   translateLoginPage();
   translateAdminUI();
+  // Re-render article table — buttons are dynamically generated with adminLang text
+  if (_articles && _articles.length) renderArticleTable(_articles);
 }
 
 // ── Switch edit language (what content is being edited) ───────────
@@ -724,19 +750,20 @@ function switchPage(page) {
   const pageEl = document.getElementById('page-'+page);
   if (pageEl) pageEl.style.display='block';
   const links = document.querySelectorAll('.sidebar-link');
-  const idx = {home:0,products:1,about:2,contact:3,buttons:4,settings:5,theme:6,password:7,update:8};
+  const idx = {home:0,products:1,about:2,contact:3,news:4,buttons:5,settings:6,theme:7,password:8,update:9};
   if (links[idx[page]] !== undefined) links[idx[page]].classList.add('active');
-  const bcZh={home:'首页管理',products:'产品管理',about:'关于我们',contact:'联系我们',buttons:'按钮管理',settings:'网站设置',theme:'主题颜色',password:'修改密码',update:'检查更新'};
-  const bcEn={home:'Home',products:'Products',about:'About Us',contact:'Contact',buttons:'Buttons',settings:'Settings',theme:'Theme',password:'Password',update:'Check Updates'};
+  const bcZh={home:'首页管理',products:'产品管理',about:'关于我们',contact:'联系我们',news:'最新动态',buttons:'按钮管理',settings:'网站设置',theme:'主题颜色',password:'修改密码',update:'检查更新'};
+  const bcEn={home:'Home',products:'Products',about:'About Us',contact:'Contact',news:'News',buttons:'Buttons',settings:'Settings',theme:'Theme',password:'Password',update:'Check Updates'};
   const bcMap = adminLang==='en' ? bcEn : bcZh;
   const bcPrefix = adminLang==='en' ? 'Admin / ' : '管理后台 / ';
   document.getElementById('adminBreadcrumb').textContent=bcPrefix+(bcMap[page]||page);
   if (page==='products') renderAdminCategories();
   if (page==='buttons')  renderBtnEditor();
+  if (page==='news')     loadArticleList();
 }
 
 function previewPage() {
-  const map={home:'index.html',products:'products.html',about:'about.html',contact:'contact.html'};
+  const map={home:'index.html',products:'products.html',about:'about.html',contact:'contact.html',news:'news.html'};
   window.open('../'+(map[currentPage]||'index.html'),'_blank');
 }
 
@@ -1014,6 +1041,466 @@ function doLogout(){
   document.getElementById('adminPanel').style.display='none';
   document.getElementById('loginOverlay').style.display='flex';
   document.getElementById('adminPassword').value='';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  Article Management
+// ══════════════════════════════════════════════════════════════════
+
+let _articles        = [];
+let _editingArticleId = null;
+let _aeCurrentTab    = 'zh';
+let _aeInsertLang    = 'zh';   // which editor the image dialog was opened from
+let _aeStatus        = 'draft';
+
+// ── Format date ───────────────────────────────────────────────────
+function fmtDate(iso) {
+  if (!iso) return adminLang === 'en' ? '(not set)' : '（未设置）';
+  const d = new Date(iso);
+  return adminLang === 'zh'
+    ? `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`
+    : d.toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
+}
+
+// ── Load article list ─────────────────────────────────────────────
+function loadArticleList() {
+  const loadEl  = document.getElementById('articleListLoading');
+  const emptyEl = document.getElementById('articleListEmpty');
+  const tableEl = document.getElementById('articleListTable');
+  if (loadEl)  { loadEl.style.display  = 'block'; }
+  if (emptyEl) { emptyEl.style.display = 'none';  }
+  if (tableEl) { tableEl.style.display = 'none';  }
+
+  fetch('/api/articles/all', { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(list => {
+      _articles = list;
+      if (loadEl) loadEl.style.display = 'none';
+      if (!list.length) {
+        if (emptyEl) emptyEl.style.display = 'block';
+        return;
+      }
+      renderArticleTable(list);
+      if (tableEl) tableEl.style.display = 'block';
+    })
+    .catch(() => {
+      if (loadEl) loadEl.style.display = 'none';
+      if (emptyEl) emptyEl.style.display = 'block';
+    });
+}
+
+// ── Render article table ──────────────────────────────────────────
+function renderArticleTable(list) {
+  const tbody = document.getElementById('articleListTbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  list.forEach(a => {
+    const titleZh = a.zh && a.zh.title ? a.zh.title : '';
+    const titleEn = a.en && a.en.title ? a.en.title : '';
+    const displayTitle = adminLang === 'en' ? (titleEn || titleZh || '(Untitled)') : (titleZh || titleEn || '（无标题）');
+    const subTitle     = adminLang === 'en' ? (titleZh ? `[CN] ${titleZh}` : '') : (titleEn ? `[EN] ${titleEn}` : '');
+    const isPub = a.status === 'published';
+    const badgeClass = isPub ? 'published' : 'draft';
+    const badgeText  = isPub ? (adminLang === 'en' ? 'Published' : '已发布') : (adminLang === 'en' ? 'Draft' : '草稿');
+    const toggleLabel = isPub
+      ? (adminLang === 'en' ? '→ Draft' : '→ 撤为草稿')
+      : (adminLang === 'en' ? '→ Publish' : '→ 发布');
+    const editLabel = adminLang === 'en' ? '✏ Edit' : '✏ 编辑';
+    const delLabel  = adminLang === 'en' ? '🗑 Delete' : '🗑 删除';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="at-title">${escHtml(displayTitle)}${subTitle?`<small>${escHtml(subTitle)}</small>`:''}</td>
+      <td><span class="article-status-badge ${badgeClass}">${badgeText}</span></td>
+      <td style="white-space:nowrap;color:#888;font-size:.85rem">${escHtml(fmtDate(a.publishedAt))}</td>
+      <td>
+        <div class="at-actions">
+          <button class="btn-edit-a" onclick="openEditArticle('${a.id}')">${editLabel}</button>
+          <button class="btn-toggle-a ${badgeClass}" onclick="toggleArticleStatus('${a.id}')">${escHtml(toggleLabel)}</button>
+          <button class="btn-del-a" onclick="deleteArticle('${a.id}')">${delLabel}</button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Open editor (new) ─────────────────────────────────────────────
+function openNewArticle() {
+  _editingArticleId = null;
+  _aeStatus = 'draft';
+  resetAeForm();
+  const titleEl = document.getElementById('aeModalTitle');
+  if (titleEl) titleEl.textContent = adminLang === 'en' ? 'New Article' : '新建文章';
+  updateAeStatusChip();
+  switchArticleTab('zh');
+  document.getElementById('articleEditorOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+// ── Open editor (edit) ────────────────────────────────────────────
+function openEditArticle(id) {
+  const a = _articles.find(x => x.id === id);
+  if (!a) return;
+  _editingArticleId = id;
+  _aeStatus = a.status || 'draft';
+  resetAeForm();
+
+  // Slug
+  const slugEl = document.getElementById('aeSlug');
+  if (slugEl) slugEl.value = a.slug || '';
+  updateSlugPreview(a.slug || '');
+
+  // Cover
+  const coverPrev = document.getElementById('aeCoverPreview');
+  const coverUrl  = document.getElementById('aeCoverUrl');
+  if (a.coverImage) {
+    if (coverPrev) { coverPrev.src = a.coverImage; coverPrev.style.display = 'block'; }
+    if (coverUrl)  coverUrl.value = a.coverImage;
+  }
+
+  // ZH content
+  const tZh = document.getElementById('aeTitleZh');
+  const sZh = document.getElementById('aeSummaryZh');
+  const cZh = document.getElementById('aeContentZhEditor');
+  if (tZh && a.zh) tZh.value = a.zh.title || '';
+  if (sZh && a.zh) sZh.value = a.zh.summary || '';
+  if (cZh && a.zh) cZh.value = a.zh.content || '';
+  if (a.zh && a.zh.format === 'html') {
+    const r = document.querySelector('input[name="aeFormatZh"][value="html"]');
+    if (r) r.checked = true;
+  }
+
+  // EN content
+  const tEn = document.getElementById('aeTitleEn');
+  const sEn = document.getElementById('aeSummaryEn');
+  const cEn = document.getElementById('aeContentEnEditor');
+  if (tEn && a.en) tEn.value = a.en.title || '';
+  if (sEn && a.en) sEn.value = a.en.summary || '';
+  if (cEn && a.en) cEn.value = a.en.content || '';
+  if (a.en && a.en.format === 'html') {
+    const r = document.querySelector('input[name="aeFormatEn"][value="html"]');
+    if (r) r.checked = true;
+  }
+
+  const titleEl = document.getElementById('aeModalTitle');
+  if (titleEl) titleEl.textContent = adminLang === 'en' ? 'Edit Article' : '编辑文章';
+  updateAeStatusChip();
+  switchArticleTab('zh');
+  document.getElementById('articleEditorOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function resetAeForm() {
+  ['aeTitleZh','aeSummaryZh','aeContentZhEditor','aeTitleEn','aeSummaryEn','aeContentEnEditor','aeCoverUrl','aeSlug'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const prev = document.getElementById('aeCoverPreview');
+  if (prev) { prev.src = ''; prev.style.display = 'none'; }
+  const slugPreview = document.getElementById('aeSlugPreview');
+  if (slugPreview) slugPreview.style.display = 'none';
+  // Reset format radios to markdown
+  ['aeFormatZh','aeFormatEn'].forEach(name => {
+    const r = document.querySelector(`input[name="${name}"][value="markdown"]`);
+    if (r) r.checked = true;
+  });
+  // Hide previews
+  ['aePreviewZh','aePreviewEn'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  // Show editors
+  ['aeContentZhEditor','aeContentEnEditor'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'block';
+  });
+}
+
+function closeArticleEditor() {
+  document.getElementById('articleEditorOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ── Status toggle ─────────────────────────────────────────────────
+function toggleAeStatus() {
+  _aeStatus = _aeStatus === 'published' ? 'draft' : 'published';
+  updateAeStatusChip();
+}
+function updateAeStatusChip() {
+  const chip = document.getElementById('aeStatusChip');
+  if (!chip) return;
+  const isPub = _aeStatus === 'published';
+  chip.className = 'ae-status-chip ' + (isPub ? 'publish' : 'draft');
+  chip.textContent = isPub
+    ? (adminLang === 'en' ? '✓ Published' : '✓ 已发布')
+    : (adminLang === 'en' ? '○ Draft' : '○ 草稿');
+}
+
+// ── Language tab switch ───────────────────────────────────────────
+function switchArticleTab(lang) {
+  _aeCurrentTab = lang;
+  document.getElementById('aeContentZh').style.display = lang === 'zh' ? 'block' : 'none';
+  document.getElementById('aeContentEn').style.display = lang === 'en' ? 'block' : 'none';
+  document.getElementById('aeTabZh').className = 'ae-tab' + (lang === 'zh' ? ' active' : '');
+  document.getElementById('aeTabEn').className = 'ae-tab' + (lang === 'en' ? ' active' : '');
+}
+
+// ── Editor toolbar insert ─────────────────────────────────────────
+function aeInsert(lang, type) {
+  const ta = document.getElementById(lang === 'zh' ? 'aeContentZhEditor' : 'aeContentEnEditor');
+  if (!ta) return;
+  const isHtml = document.querySelector(`input[name="aeFormat${lang==='zh'?'Zh':'En'}"][value="html"]`)?.checked;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const sel   = ta.value.slice(start, end) || (lang === 'zh' ? '文字' : 'text');
+
+  const snips = {
+    bold:  isHtml ? [`<strong>`, sel, `</strong>`] : [`**`, sel, `**`],
+    italic:isHtml ? [`<em>`,     sel, `</em>`]     : [`*`,  sel, `*`],
+    h2:    isHtml ? [`\n<h2>`,   sel, `</h2>\n`]   : [`\n## `, sel, ``],
+    h3:    isHtml ? [`\n<h3>`,   sel, `</h3>\n`]   : [`\n### `, sel, ``],
+    link:  isHtml ? [`<a href="url">`, sel, `</a>`]  : [`[`, sel, `](url)`],
+    ul:    isHtml ? [`\n<ul>\n  <li>`, sel, `</li>\n</ul>\n`] : [`\n- `, sel, ``],
+    ol:    isHtml ? [`\n<ol>\n  <li>`, sel, `</li>\n</ol>\n`] : [`\n1. `, sel, ``],
+    quote: isHtml ? [`\n<blockquote>`, sel, `</blockquote>\n`] : [`\n> `, sel, ``],
+    code:  isHtml ? [`<code>`, sel, `</code>`]     : ['`', sel, '`'],
+    hr:    isHtml ? [`\n<hr>\n`, '', ''] : [`\n---\n`, '', ''],
+  };
+  const [before, mid, after] = snips[type] || ['', sel, ''];
+  const insert = before + mid + after;
+  ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
+  const cursor = start + before.length + mid.length;
+  ta.setSelectionRange(cursor, cursor);
+  ta.focus();
+}
+
+// ── Preview toggle ────────────────────────────────────────────────
+function toggleAePreview(lang) {
+  const editorId = lang === 'zh' ? 'aeContentZhEditor' : 'aeContentEnEditor';
+  const previewId = lang === 'zh' ? 'aePreviewZh' : 'aePreviewEn';
+  const ta      = document.getElementById(editorId);
+  const preview = document.getElementById(previewId);
+  if (!ta || !preview) return;
+  const isHtml  = document.querySelector(`input[name="aeFormat${lang==='zh'?'Zh':'En'}"][value="html"]`)?.checked;
+  if (preview.style.display === 'none') {
+    let html;
+    if (isHtml) {
+      html = ta.value;
+    } else {
+      html = typeof marked !== 'undefined' ? marked.parse(ta.value) : ta.value.replace(/\n/g, '<br>');
+    }
+    preview.innerHTML = html;
+    preview.style.display = 'block';
+    ta.style.display = 'none';
+  } else {
+    preview.style.display = 'none';
+    ta.style.display = 'block';
+    ta.focus();
+  }
+}
+
+// ── Image insert dialog ───────────────────────────────────────────
+function aeInsertImage(lang) {
+  _aeInsertLang = lang;
+  const dialog = document.getElementById('aeImageDialog');
+  if (!dialog) return;
+  const urlInput = document.getElementById('aeImgUrlInput');
+  const statusEl = document.getElementById('aeImgUploadStatus');
+  if (urlInput)  urlInput.value = '';
+  if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
+  const fileInput = document.getElementById('aeImgFileInput');
+  if (fileInput) fileInput.value = '';
+  dialog.style.display = 'flex';
+}
+
+function closeAeImageDialog() {
+  const dialog = document.getElementById('aeImageDialog');
+  if (dialog) dialog.style.display = 'none';
+}
+
+function handleAeImageUpload(input) {
+  if (!input.files?.[0]) return;
+  const statusEl = document.getElementById('aeImgUploadStatus');
+  if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = adminLang === 'en' ? 'Uploading...' : '上传中...'; }
+  const r = new FileReader();
+  r.onload = e => {
+    fetch('/api/upload-image', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
+      body: JSON.stringify({ data: e.target.result, filename: input.files[0].name })
+    })
+    .then(res => res.json())
+    .then(resp => {
+      if (resp.url) {
+        const urlInput = document.getElementById('aeImgUrlInput');
+        if (urlInput) urlInput.value = resp.url;
+        if (statusEl) { statusEl.textContent = adminLang === 'en' ? '✅ Uploaded' : '✅ 上传成功'; }
+      } else {
+        if (statusEl) { statusEl.textContent = adminLang === 'en' ? '❌ Upload failed' : '❌ 上传失败'; }
+      }
+    })
+    .catch(() => { if (statusEl) statusEl.textContent = adminLang === 'en' ? '❌ Network error' : '❌ 网络错误'; });
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+function insertAeImage() {
+  const urlInput = document.getElementById('aeImgUrlInput');
+  const url = urlInput ? urlInput.value.trim() : '';
+  if (!url) { closeAeImageDialog(); return; }
+  const lang = _aeInsertLang;
+  const isHtml = document.querySelector(`input[name="aeFormat${lang==='zh'?'Zh':'En'}"][value="html"]`)?.checked;
+  const tag = isHtml ? `\n<img src="${url}" alt="">\n` : `\n![](${url})\n`;
+  const ta = document.getElementById(lang === 'zh' ? 'aeContentZhEditor' : 'aeContentEnEditor');
+  if (ta) {
+    const pos = ta.selectionStart || ta.value.length;
+    ta.value = ta.value.slice(0, pos) + tag + ta.value.slice(pos);
+    ta.focus();
+  }
+  closeAeImageDialog();
+}
+
+// ── Cover image upload ────────────────────────────────────────────
+function handleArticleCoverUpload(input) {
+  if (!input.files?.[0]) return;
+  const r = new FileReader();
+  r.onload = e => {
+    fetch('/api/upload-image', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
+      body: JSON.stringify({ data: e.target.result, filename: input.files[0].name })
+    })
+    .then(res => res.json())
+    .then(resp => {
+      if (resp.url) {
+        const urlInput = document.getElementById('aeCoverUrl');
+        const prev     = document.getElementById('aeCoverPreview');
+        if (urlInput) urlInput.value = resp.url;
+        if (prev)     { prev.src = resp.url; prev.style.display = 'block'; }
+      }
+    })
+    .catch(() => {});
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+function applyArticleCoverUrl() {
+  const inp  = document.getElementById('aeCoverUrl');
+  const prev = document.getElementById('aeCoverPreview');
+  if (!inp || !inp.value) return;
+  if (prev) { prev.src = inp.value; prev.style.display = 'block'; }
+}
+
+// ── Slug preview helper ───────────────────────────────────────────
+function updateSlugPreview(slug) {
+  const el = document.getElementById('aeSlugPreview');
+  if (!el) return;
+  if (slug) {
+    el.textContent = window.location.origin + '/articles/' + slug + '.html';
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+// Wire slug input live preview on first render
+(function wireSlugInput() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const slugEl = document.getElementById('aeSlug');
+    if (slugEl) slugEl.addEventListener('input', () => updateSlugPreview(slugEl.value.trim()));
+  });
+})();
+
+// ── Save article (create or update) ──────────────────────────────
+function saveArticle() {
+  const rawSlug = (document.getElementById('aeSlug')?.value || '').trim();
+  // Auto-generate slug from EN title if empty
+  const autoSlug = rawSlug ||
+    (document.getElementById('aeTitleEn')?.value.trim() || '')
+      .toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 80) ||
+    ('article-' + Date.now());
+
+  const payload = {
+    status:      _aeStatus,
+    slug:        autoSlug,
+    coverImage:  (document.getElementById('aeCoverUrl')?.value || '').trim(),
+    zh: {
+      title:   document.getElementById('aeTitleZh')?.value.trim()   || '',
+      summary: document.getElementById('aeSummaryZh')?.value.trim() || '',
+      content: document.getElementById('aeContentZhEditor')?.value  || '',
+      format:  document.querySelector('input[name="aeFormatZh"]:checked')?.value || 'markdown',
+    },
+    en: {
+      title:   document.getElementById('aeTitleEn')?.value.trim()   || '',
+      summary: document.getElementById('aeSummaryEn')?.value.trim() || '',
+      content: document.getElementById('aeContentEnEditor')?.value  || '',
+      format:  document.querySelector('input[name="aeFormatEn"]:checked')?.value || 'markdown',
+    },
+  };
+
+  // Require at least one title
+  if (!payload.zh.title && !payload.en.title) {
+    showAdminToast(adminLang === 'en' ? '⚠ Please enter at least one title (CN or EN).' : '⚠ 请至少填写一个语言的标题', 'error');
+    return;
+  }
+
+  const isNew = !_editingArticleId;
+  const url    = isNew ? '/api/articles' : `/api/articles/${_editingArticleId}`;
+  const method = isNew ? 'POST' : 'PUT';
+  const saveBtn = document.querySelector('#articleEditorOverlay .btn-primary');
+  if (saveBtn) saveBtn.disabled = true;
+
+  fetch(url, {
+    method, headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin', body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(resp => {
+    if (resp.id) {
+      closeArticleEditor();
+      loadArticleList();
+      showAdminToast(adminLang === 'en' ? '✅ Article saved!' : '✅ 文章已保存！', 'success');
+    } else {
+      showAdminToast(adminLang === 'en' ? '❌ Save failed: ' + (resp.error || '') : '❌ 保存失败：' + (resp.error || ''), 'error');
+    }
+  })
+  .catch(() => showAdminToast(adminLang === 'en' ? '❌ Network error' : '❌ 网络错误', 'error'))
+  .finally(() => { if (saveBtn) saveBtn.disabled = false; });
+}
+
+// ── Toggle publish/draft ──────────────────────────────────────────
+function toggleArticleStatus(id) {
+  const a = _articles.find(x => x.id === id);
+  if (!a) return;
+  const newStatus = a.status === 'published' ? 'draft' : 'published';
+  fetch(`/api/articles/${id}`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin', body: JSON.stringify({ ...a, status: newStatus })
+  })
+  .then(r => r.json())
+  .then(resp => {
+    if (resp.id) {
+      loadArticleList();
+      const msg = newStatus === 'published'
+        ? (adminLang === 'en' ? '✅ Article published!' : '✅ 文章已发布！')
+        : (adminLang === 'en' ? '✅ Article set to draft.' : '✅ 文章已撤为草稿。');
+      showAdminToast(msg, 'success');
+    }
+  })
+  .catch(() => showAdminToast(adminLang === 'en' ? '❌ Network error' : '❌ 网络错误', 'error'));
+}
+
+// ── Delete article ────────────────────────────────────────────────
+function deleteArticle(id) {
+  const msg = adminLang === 'en' ? 'Delete this article? This cannot be undone.' : '确定删除该文章？此操作不可撤销。';
+  if (!confirm(msg)) return;
+  fetch(`/api/articles/${id}`, { method: 'DELETE', credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(resp => {
+      if (resp.status === 'ok') {
+        loadArticleList();
+        showAdminToast(adminLang === 'en' ? '✅ Article deleted.' : '✅ 文章已删除。', 'success');
+      }
+    })
+    .catch(() => showAdminToast(adminLang === 'en' ? '❌ Network error' : '❌ 网络错误', 'error'));
 }
 
 // ── INIT

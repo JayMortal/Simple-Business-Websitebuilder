@@ -16,11 +16,12 @@
 | ✏️ 可视化编辑 | 登录后直接点击页面文字/图片即可编辑 |
 | 🗂 实时侧边栏 | 侧边编辑器，修改立刻呈现在页面上 |
 | ⚙️ 管理后台 | 完整内容管理，入口 `/admin.html` |
+| 📰 最新动态 | 发布文章，每篇文章独立URL（`/articles/{slug}.html`），Markdown/HTML 编辑器 |
 | 🔘 按钮管理 | 每个按钮独立设置：跳转页面 / 发邮件 / 外部链接 |
 | 🎨 主题颜色 | 颜色选择器 + 6 套预设方案 |
 | 🔒 安全登录 | bcrypt 密码哈希 + 服务端 Session + 暴力破解锁定 |
 | 🐳 Docker 就绪 | 一条命令部署，完美兼容 1Panel / aaPanel 等面板 |
-| 📦 无需数据库 | 所有数据存储在单一 `site-data.json` 文件中 |
+| 📦 无需数据库 | 所有数据存储在 JSON 文件中，无需安装数据库 |
 
 ---
 
@@ -32,13 +33,16 @@ Simple-Business-Websitebuilder/
 ├── products.html         # 产品介绍
 ├── about.html            # 关于我们
 ├── contact.html          # 联系我们
+├── news.html             # 最新动态（文章列表）
+├── article.html          # 文章详情模板（发布时复制到 articles/{slug}.html）
 ├── admin.html            # 管理后台（/admin.html）
 ├── server.js             # 后端服务器（Express：认证、保存、静态文件）
 ├── package.json          # Node.js 依赖声明
 ├── .env.example          # 环境变量模板 → 复制为 .env 后填写
 ├── css/
 │   ├── style.css
-│   └── admin.css
+│   ├── admin.css
+│   └── news.css          # 最新动态页面与文章详情样式
 ├── js/
 │   ├── i18n.js           # 双语逻辑 + 自动语言识别
 │   ├── main.js           # 核心逻辑、编辑模式、服务器同步
@@ -46,9 +50,14 @@ Simple-Business-Websitebuilder/
 │   ├── btn-actions.js    # 按钮动作管理
 │   ├── sidebar-editor.js # 实时侧边栏编辑器
 │   ├── products-data.js  # 产品数据存储
-│   └── products.js       # 产品页面渲染
+│   ├── products.js       # 产品页面渲染
+│   ├── news.js           # 最新动态页面逻辑
+│   └── article.js        # 文章详情页面逻辑
 ├── data/                 # 通过 Docker volume 持久化（运行时自动创建）
-│   └── site-data.json    # 所有网站内容
+│   ├── site-data.json    # 网站内容（文字、图片、按钮、主题）
+│   └── articles.json     # 文章元数据
+├── articles/             # 生成的文章HTML文件（Docker volume，持久化保存）
+├── img/                  # 上传的图片文件（Docker volume，持久化保存）
 ├── Dockerfile
 ├── docker-compose.yml
 ├── update.sh             # Docker 一键更新脚本
@@ -90,7 +99,7 @@ nano .env   # 填写 ADMIN_PASSWORD 和 SESSION_SECRET
 |------|------|------|
 | `ADMIN_PASSWORD` | 初始管理员密码（仅首次启动生效） | `admin123` |
 | `SESSION_SECRET` | Session 签名密钥，**必须修改为随机字符串** | 占位符 |
-| `PORT` | 宿主机监听端口 | `14514` |
+| `PORT` | 宿主机监听端口 | `14515` |
 
 生成安全的 `SESSION_SECRET`：
 ```bash
@@ -100,7 +109,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ### 第二步：创建数据目录并启动
 
 ```bash
-mkdir -p data
+mkdir -p data img articles
 docker compose up -d --build
 ```
 
@@ -111,10 +120,10 @@ docker compose up -d --build
 **以 1Panel 为例：**
 1. 网站 → 创建网站 → 选择「**反向代理**」
 2. 主域名填写你的域名
-3. 代理地址填写 `http://127.0.0.1:14514`
+3. 代理地址填写 `http://127.0.0.1:14515`
 4. 在网站 HTTPS 设置中申请 Let's Encrypt 证书
 
-aaPanel、宝塔面板等操作类似，均为创建反向代理站点指向 `127.0.0.1:14514`。
+aaPanel、宝塔面板等操作类似，均为创建反向代理站点指向 `127.0.0.1:14515`。
 
 ### 第四步：验证部署
 
@@ -210,7 +219,7 @@ bash update.sh
 
 | 项目 | 说明 |
 |------|------|
-| 版本 | v0.2 |
+| 版本 | v0.3 |
 | 后端 | Node.js 20 + Express，无需数据库 |
 | 认证方式 | express-session（httpOnly Cookie，8 小时有效期）|
 | 部署方式 | Docker（推荐）|
@@ -219,4 +228,33 @@ bash update.sh
 
 ---
 
-*[Simple-Business-Websitebuilder](https://github.com/your-username/Simple-Business-Websitebuilder) v0.2*
+### 更新日志
+
+**v0.3** — 最新动态与文章页面
+- 新增最新动态页面（文章列表、分页、中英双语回退）
+- 每篇文章拥有独立 URL（`/articles/{slug}.html`），存储为实体 HTML 文件
+- 最新动态列表每行固定显示 3 篇，每页 6 篇，分页按钮根据文章总数自动生成
+- 修复文章点击无响应问题——即使静态文件尚未生成，文章也能正常打开
+- 管理后台文章编辑器：Markdown/HTML、中英双语标签页、封面图、工具栏、图片上传
+- 上传图片存储于独立 `img/` Docker volume，升级时完整保留
+- 管理后台文章列表按钮（编辑/撤为草稿/删除）切换界面语言时立即同步翻译
+- 前台导航栏整体居中，字号增大约 2–4px
+- 删除产品介绍、关于我们、联系我们页面顶部的「首页 / xxx」面包屑导航
+- 首次部署自动预填3篇示例文章
+- 全面修复管理后台中英文混用问题
+
+**v0.2** — 后端重构
+- 后端从 PHP 迁移至 Node.js + Express
+- 认证改为 express-session httpOnly Cookie
+- HTML 强制 no-cache，更新后立即生效
+- 管理后台首次访问自动识别浏览器语言
+
+**v0.1** — 首个正式版本
+- 中英双语内容独立编辑
+- 访客语言自动识别
+- 实时侧边栏编辑、主题颜色、按钮管理
+- Docker 一键部署
+
+---
+
+*[Simple-Business-Websitebuilder](https://github.com/your-username/Simple-Business-Websitebuilder) v0.3*

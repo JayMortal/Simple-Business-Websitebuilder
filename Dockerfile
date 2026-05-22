@@ -14,9 +14,9 @@ RUN npm install --production --no-audit --no-fund
 # Copy all source files
 COPY . .
 
-# Ensure data directory exists (the volume mount overlays it at runtime)
-RUN mkdir -p data
+# Ensure persistent directories exist (volume mounts overlay them at runtime)
+RUN mkdir -p data img articles
 
-EXPOSE 14514
+EXPOSE 14515
 
 CMD ["node", "server.js"]
